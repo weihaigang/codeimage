@@ -5,11 +5,11 @@ import numpy as np
 from PIL import Image
 
 
-IMAGE_HEIGHT=150
-IMAGE_WIDTH=70
+IMAGE_HEIGHT=30
+IMAGE_WIDTH=110
 
-# captcha_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-captcha_chars = '0123456789'
+captcha_chars = '01'
+# captcha_chars = '0123456789'
 char_idx_mappings = {}
 idx_char_mappings = {}
 
@@ -54,12 +54,14 @@ def vec2text1(vec):
 
 
 
-
-processed_pics_dir='../data'
+# processed_pics_dir='../data'
+processed_pics_dir='./data'
 
 img_idx_filename_mappings = {}
 img_idx_text_mappings = {}
 img_idxes = []
+
+index=0
 # 首先遍历目录，根据文件名初始化idx->filename, idx->text的映射，同时初始化idx列表
 for (dirpath, dirnames, filenames) in os.walk(processed_pics_dir):
     for filename in filenames:
@@ -86,8 +88,10 @@ def get_batch_data(batch_size):
         else:
             with open(processed_pics_dir + '/' + img_idx_filename_mappings[target_idx], 'rb') as f:
                 image = Image.open(f)
+                image=image.convert('L')
                 # 对数据正则化，tensorflow处理时更高效
-                image = np.array(image)/255
+                image = np.array(image)/255.0
+
             sample_idx_image_mappings[target_idx] = image
         label = None
         if target_idx in sample_idx_label_mappings:
@@ -101,7 +105,8 @@ def get_batch_data(batch_size):
     y = np.array(labels)
     return (x, y)
 
-
-(x, y)= get_batch_data(10)
-
-print(x.shape)
+#
+(x,y)=get_batch_data(1)
+#
+print(y[0])
+# print(x.reshape(-1, IMAGE_HEIGHT, IMAGE_WIDTH, 1).shape)
